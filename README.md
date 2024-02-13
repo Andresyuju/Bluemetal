@@ -6,104 +6,38 @@ Este script de Python está diseñado para automatizar el proceso de prueba de l
 
 Este script es solo para propósitos educativos y de pruebas de penetración autorizadas. El uso de este script en redes o sistemas sin permiso explícito es ilegal y contrario a las prácticas éticas de ciberseguridad.
 
-## Requisitos Previos
+# Script de Explotación con Metasploit
+
+Este script en Python utiliza Metasploit para ejecutar exploits contra sistemas Windows vulnerables, específicamente el exploit EternalBlue. Permite intentar la explotación utilizando exploits tanto para sistemas de 64 bits como para sistemas de 32 bits, y también ofrece la opción de proporcionar credenciales SMB para mejorar las posibilidades de éxito.
+
+## Requisitos
 
 - Python 3.x
-- Metasploit Framework
-- pymetasploit3 (Python library)
-- Acceso a una instancia de msfrpcd corriendo y accesible
+- Metasploit Framework instalado y configurado
+- Conexión a internet para descargar las últimas actualizaciones de Metasploit
 
-## Configuración
+## Instalación de Dependencias
 
-1. Asegúrate de tener Metasploit Framework instalado y actualizado en tu sistema.
-2. Inicia el servicio `msfrpcd` en Metasploit con el comando:
-3. msfrpcd -P [password] -S -a 127.0.0.1
-4. Donde `[password]` es una contraseña segura de tu elección.
-3. Clona este repositorio o descarga el script en tu sistema Kali Linux.
+1. **Python 3.x:** Si aún no tienes Python instalado, puedes descargarlo desde [python.org](https://www.python.org/downloads/).
 
-## Instalación
+2. **Metasploit Framework:** La instalación de Metasploit puede variar según tu sistema operativo. Puedes encontrar instrucciones detalladas para la instalación en la [documentación oficial de Metasploit](https://github.com/rapid7/metasploit-framework/wiki/Nightly-Installers).
 
-Antes de ejecutar el script, instala las dependencias necesarias:
+## Uso
 
-```bash
-pip install pymetasploit3
-Para ejecutar el script, navega a la carpeta que contiene eternalblue_automation.py y ejecuta:
-python eternalblue_automation.py
+1. Clona este repositorio o descarga el script `exploit.py`.
+2. Abre una terminal y navega hasta el directorio donde se encuentra el script.
+3. Ejecuta el script escribiendo `python3 exploit.py` y presiona Enter.
+4. Sigue las instrucciones en pantalla para ingresar la IP del objetivo, tu IP local y, opcionalmente, credenciales SMB si se desea.
 
-Crear un archivo README.md es esencial para documentar el propósito y las instrucciones de uso de tu script. Aquí te proporciono una plantilla de README.md para el script que hemos discutido:
+## Importante
 
-markdown
-Copy code
-# EternalBlue Automation Script
+- Este script es únicamente con fines educativos y de prueba en entornos controlados. No debe utilizarse para actividades ilegales o maliciosas.
+- El uso indebido de este script puede ser ilegal y está sujeto a sanciones legales.
 
-Este script de Python está diseñado para automatizar el proceso de prueba de la vulnerabilidad MS17-010, conocida como EternalBlue, en sistemas Windows.
+## Contribuciones
 
-## Advertencia
+Las contribuciones son bienvenidas. Si encuentras algún error, tienes ideas para mejoras o deseas agregar nuevas características, por favor abre un problema o envía una solicitud de extracción.
 
-Este script es solo para propósitos educativos y de pruebas de penetración autorizadas. El uso de este script en redes o sistemas sin permiso explícito es ilegal y contrario a las prácticas éticas de ciberseguridad.
+## Descargo de responsabilidad
 
-## Requisitos Previos
-
-- Python 3.x
-- Metasploit Framework
-- pymetasploit3 (Python library)
-- Acceso a una instancia de msfrpcd corriendo y accesible
-
-## Configuración
-
-1. Asegúrate de tener Metasploit Framework instalado y actualizado en tu sistema.
-2. Inicia el servicio `msfrpcd` en Metasploit con el comando:
-msfrpcd -P [password] -S -a 127.0.0.1
-
-markdown
-Copy code
-Donde `[password]` es una contraseña segura de tu elección.
-3. Clona este repositorio o descarga el script en tu sistema Kali Linux.
-
-## Instalación
-
-Antes de ejecutar el script, instala las dependencias necesarias:
-
-```bash
-pip install pymetasploit3
-Uso
-Para ejecutar el script, navega a la carpeta que contiene eternalblue_automation.py y ejecuta:
-
-bash
-Copy code
-python eternalblue_automation.py
-Sigue las instrucciones en la terminal para introducir la IP del objetivo y tu IP local.
-
-Funcionamiento Interno
-El script realizará las siguientes acciones:
-
-Verificar e instalar la biblioteca pymetasploit3 si es necesario.
-Actualizar la base de datos de Metasploit y el framework.
-Pedir al usuario la dirección IP del objetivo y la IP local (LHOST).
-Intentar explotar la vulnerabilidad utilizando diferentes módulos relacionados con MS17-010.
-Si se requiere autenticación y un exploit falla, pedirá al usuario las credenciales del sistema objetivo.
-Intentará otros exploits de la base de datos de Metasploit si los especificados no funcionan.
-Contribuciones
-Las contribuciones a este script son bienvenidas. Por favor, asegúrate de seguir las buenas prácticas de programación y documentación al hacer cambios o mejoras.
-
-Licencia
-Este proyecto se distribuye bajo la licencia MIT. Consulte el archivo LICENSE para obtener más información.
-Y aquí tienes un paso a paso para hacer funcionar el script:
-
-1. **Instalación de Metasploit**: Asegúrate de que Metasploit Framework esté instalado en tu sistema Kali Linux. Puedes instalarlo con:
-
-   ```bash
-   sudo apt-get install metasploit-framework
-Iniciar msfrpcd: Antes de ejecutar el script, necesitas tener el servicio msfrpcd corriendo. Ejecútalo con el siguiente comando:
-msfrpcd -P yourpassword -S -a 127.0.0.1
-Cambia yourpassword a una contraseña segura de tu elección.
-
-Clonar el Repositorio/Descargar el Script: Obtén el script eternalblue_automation.py y guárdalo en tu sistema Kali Linux.
-
-Instalar pymetasploit3: Si aún no tienes la biblioteca pymetasploit3 instalada, puedes hacerlo con pip:
-pip install pymetasploit3
-Ejecutar el Script: Abre una terminal, navega hasta el directorio donde se encuentra el script y ejecútalo con:
-python eternalblue_automation.py
-Sigue las indicaciones en la terminal para ingresar la IP del objetivo y tu IP local.
-
-Seguir las Indicaciones: El script te guiará a través del proceso y realizará las pruebas automáticamente. Proporciona las credenciales cuando se te solicite si es necesario.
+El autor y los contribuyentes de este script no se hacen responsables de ningún daño causado por el mal uso de este script. Utilízalo bajo tu propio riesgo y responsabilidad.
